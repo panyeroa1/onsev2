@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ONSE - Login</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+</head>
+<body>
+  <div class="login-container">
+    <h1>ONSE - Login</h1>
+    <div id="login-error" class="error"></div>
+    <!-- Email/Password Login Form -->
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login with Email</button>
+    </form>
+    <!-- Google Login Button -->
+    <button id="googleLogin">Login with Google</button>
+    <!-- Guest (Anonymous) Login -->
+    <button id="guestLogin">Sign In as Guest</button>
+    <p>Don't have an account? <a href="#" id="signUpLink">Sign Up</a></p>
+    <!-- Sign Up Section -->
+    <div id="signupSection" style="display:none;">
+      <form id="signupForm">
+        <input type="email" id="signupEmail" placeholder="Email" required />
+        <input type="password" id="signupPassword" placeholder="Password" required />
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_XyYzO2Qi8gzBOdABUw_wxeSd51sEdk0",
+      authDomain: "prime-h51r5w.firebaseapp.com",
+      databaseURL: "https://prime-h51r5w-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "prime-h51r5w",
+      storageBucket: "prime-h51r5w.appspot.com",
+      messagingSenderId: "853174787668",
+      appId: "1:853174787668:web:190f1ff41c5c43857957c1"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Email Login
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(err => {
+          document.getElementById("login-error").innerText = err.message;
+        });
+    });
+
+    // Google Login
+    document.getElementById("googleLogin").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(err => {
+          document.getElementById("login-error").innerText = err.message;
+        });
+    });
+
+    // Guest Login (Anonymous)
+    document.getElementById("guestLogin").addEventListener("click", () => {
+      auth.signInAnonymously()
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(err => {
+          document.getElementById("login-error").innerText = err.message;
+        });
+    });
+
+    // Toggle Sign Up Section
+    document.getElementById("signUpLink").addEventListener("click", () => {
+      const signupSection = document.getElementById("signupSection");
+      signupSection.style.display = signupSection.style.display === "none" ? "block" : "none";
+    });
+
+    // Email Sign Up
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = "index.html";
+        })
+        .catch(err => {
+          document.getElementById("login-error").innerText = err.message;
+        });
+    });
+  </script>
+</body>
+</html>
