@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ONSE - Homepage</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <header>
+    <h1>ONSE - Online Secretary</h1>
+    <button id="logoutBtn">Logout</button>
+    <a href="createSecretary.html">Create Secretary Profile</a>
+  </header>
+
+  <main>
+    <div id="secretaryList"></div>
+  </main>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_XyYzO2Qi8gzBOdABUw_wxeSd51sEdk0",
+      authDomain: "prime-h51r5w.firebaseapp.com",
+      databaseURL: "https://prime-h51r5w-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "prime-h51r5w",
+      storageBucket: "prime-h51r5w.appspot.com",
+      messagingSenderId: "853174787668",
+      appId: "1:853174787668:web:190f1ff41c5c43857957c1"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Redirect to login if not authenticated
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        loadSecretaries();
+      }
+    });
+
+    // Logout functionality
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      auth.signOut();
+    });
+
+    // Dummy secretaries data (20 dummy profiles)
+    const dummySecretaries = [];
+    for (let i = 1; i <= 20; i++) {
+      dummySecretaries.push({
+        name: `Secretary ${i}`,
+        location: "Makati, PH",
+        bio: "Experienced secretary with excellent administrative skills.",
+        imageUrl: "https://via.placeholder.com/100x100.png?text=Sec+" + i,
+        isPublic: true,
+        unlockCost: 5
+      });
+    }
+
+    // Pagination variables for infinite scroll
+    let currentIndex = 0;
+    const pageSize = 5;
+    const secretaryListDiv = document.getElementById("secretaryList");
+
+    // Function to load next batch of secretaries
+    function loadSecretaries() {
+      const nextSecretaries = dummySecretaries.slice(currentIndex, currentIndex + pageSize);
+      nextSecretaries.forEach(sec => {
+        const card = document.createElement("div");
+        card.className = "secretary-card";
+        card.innerHTML = `
+          <img src="${sec.imageUrl}" alt="${sec.name}" />
+          <h3>${sec.name}</h3>
+          <p>${sec.location}</p>
+          <p>${sec.bio}</p>
+          <button>Unlock Profile (${sec.unlockCost} ONCE)</button>
+          <button>Book Now</button>
+        `;
+        secretaryListDiv.appendChild(card);
+      });
+      currentIndex += pageSize;
+    }
+
+    // Infinite scroll: load more as user nears bottom
+    window.addEventListener("scroll", () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+        if (currentIndex < dummySecretaries.length) {
+          loadSecretaries();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
